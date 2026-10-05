@@ -51,7 +51,7 @@ export function PriceTrendChart({ data }: { data: PriceTrendData[] }) {
         <YAxis tick={{ fill: '#4b6080', fontSize: 11 }} axisLine={false} tickLine={false}
           tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
         <Tooltip contentStyle={chartTooltipStyle}
-          formatter={(value: any, name: string) => [`₹${Number(value).toLocaleString('en-IN')}`, name]}
+          formatter={(value: any, name: any) => [`₹${Number(value).toLocaleString('en-IN')}`, name]}
         />
         <Legend wrapperStyle={{ fontSize: '12px', color: '#8da2c0' }} />
         <Area type="monotone" dataKey="market_avg" name="Market Avg" stroke="#10b981" strokeWidth={1.5}
