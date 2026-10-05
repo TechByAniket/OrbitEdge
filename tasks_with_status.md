@@ -296,12 +296,15 @@ Tracking can be performed against configurable booking scenarios.
 
 ## TASK 4.1 — Build MakeMyTrip Collector Foundation
 
-* [ ] Create MMT collector module
-* [ ] Create Playwright browser configuration
-* [ ] Implement navigation
-* [ ] Implement timeout handling
-* [ ] Implement page-load handling
-* [ ] Implement basic error handling
+* [x] Create MMT collector module
+* [x] Create Playwright browser configuration
+* [x] Implement navigation
+* [x] Implement timeout handling
+* [x] Implement page-load handling
+* [x] Implement basic error handling
+
+**Completion note:**
+Implemented robust `BrowserManager` and `MakeMyTripCollector` classes in `backend/app/collectors/makemytrip` using `async_playwright`. Added anti-bot flags, custom user agents, and resilient navigation wrappers.
 
 **Important:**
 
@@ -313,19 +316,22 @@ Do not make the whole tracker dependent on one successful property.
 
 Collector should attempt to extract:
 
-* [ ] Property name
-* [ ] Property URL
-* [ ] Rating
-* [ ] Review count
-* [ ] Room types
-* [ ] Availability
-* [ ] Price
-* [ ] Discounts
-* [ ] Taxes/fees
-* [ ] Breakfast/meal information
-* [ ] Cancellation policy
-* [ ] Amenities
-* [ ] Guest capacity
+* [x] Property name
+* [x] Property URL
+* [x] Rating
+* [x] Review count
+* [x] Room types
+* [x] Availability
+* [x] Price
+* [x] Discounts
+* [x] Taxes/fees
+* [x] Breakfast/meal information
+* [x] Cancellation policy
+* [x] Amenities
+* [x] Guest capacity
+
+**Completion note:**
+Implemented `extract_property_details` and `extract_rooms_and_prices` in `MakeMyTripCollector` parsing comprehensive property info, amenities, and room pricing/capacity data.
 
 ---
 
@@ -1250,29 +1256,21 @@ The next coding-agent session must read this section before continuing.
 
 Completed:
 
-* TASK 2.3 — Property API
-* TASK 3.1 — Define Booking Scenario Model
-* TASK 3.2 — Create Default Scenarios
-* TASK 3.3 — Scenario API
+* TASK 4.1 — Build MakeMyTrip Collector Foundation
+* TASK 4.2 — Extract Property-Level Information
 
 Files changed:
 
-* `backend/app/models/scenario.py`
-* `backend/app/schemas/scenario.py`
-* `backend/scripts/create_default_scenarios.py`
-* `backend/app/api/scenarios.py`
-* `backend/app/main.py`
+* `backend/app/collectors/makemytrip/collector.py`
 * `tasks_with_status.md`
 
 Important implementation notes:
 
-* Created SQLAlchemy models and Pydantic schemas for `BookingScenario`.
-* Script inserted 5 default booking scenarios combinations into database.
-* Exposed CRUD API endpoints for scenarios.
+* Added `extract_property_details` logic to `MakeMyTripCollector` to parse name, rating, reviews, dates, and selected guests using CSS selectors.
 
 Next task:
 
-* TASK 4.1 — Build MakeMyTrip Collector Foundation
+* TASK 4.3 — Extract Availability & Pricing
 
 Blocked:
 
