@@ -51,7 +51,7 @@ export function PriceTrendChart({ data }: { data: PriceTrendData[] }) {
         <YAxis tick={{ fill: '#4b6080', fontSize: 11 }} axisLine={false} tickLine={false}
           tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
         <Tooltip contentStyle={chartTooltipStyle}
-          formatter={(value: number, name: string) => [`₹${value.toLocaleString('en-IN')}`, name]}
+          formatter={(value: any, name: string) => [`₹${Number(value).toLocaleString('en-IN')}`, name]}
         />
         <Legend wrapperStyle={{ fontSize: '12px', color: '#8da2c0' }} />
         <Area type="monotone" dataKey="market_avg" name="Market Avg" stroke="#10b981" strokeWidth={1.5}
@@ -87,7 +87,7 @@ export function CompetitorPriceChart({ data }: { data: CompetitorPriceData[] }) 
         <YAxis tick={{ fill: '#4b6080', fontSize: 11 }} axisLine={false} tickLine={false}
           tickFormatter={(v) => `₹${(v / 1000).toFixed(0)}k`} />
         <Tooltip contentStyle={chartTooltipStyle}
-          formatter={(value: number) => [`₹${value.toLocaleString('en-IN')}`, 'Price']} />
+          formatter={(value: any) => [`₹${Number(value).toLocaleString('en-IN')}`, 'Price']} />
         <Bar dataKey="price" radius={[4, 4, 0, 0]}
           fill="#3b82f6"
           label={false}
@@ -117,7 +117,7 @@ export function DemandChart({ data }: { data: DemandData[] }) {
         <CartesianGrid strokeDasharray="3 3" stroke="#1e2d40" vertical={false} />
         <XAxis dataKey="date" tick={{ fill: '#4b6080', fontSize: 11 }} axisLine={false} tickLine={false} />
         <YAxis tick={{ fill: '#4b6080', fontSize: 11 }} axisLine={false} tickLine={false} domain={[0, 100]} />
-        <Tooltip contentStyle={chartTooltipStyle} formatter={(v: number) => [`${v}/100`, 'Demand Score']} />
+        <Tooltip contentStyle={chartTooltipStyle} formatter={(v: any) => [`${v}/100`, 'Demand Score']} />
         <ReferenceLine y={70} stroke="#f97316" strokeDasharray="3 3" label={{ value: 'High', fill: '#f97316', fontSize: 10 }} />
         <Line type="monotone" dataKey="demand" stroke="#f97316" strokeWidth={2}
           dot={false} activeDot={{ r: 4, fill: '#f97316' }} />
