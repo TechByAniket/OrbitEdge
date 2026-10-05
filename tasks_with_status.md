@@ -337,14 +337,17 @@ Implemented `extract_property_details` and `extract_rooms_and_prices` in `MakeMy
 
 ## TASK 4.3 — Normalize MMT Data
 
-* [ ] Convert prices to numeric values
-* [ ] Normalize availability
-* [ ] Normalize room names
-* [ ] Normalize rating
-* [ ] Normalize review count
-* [ ] Normalize cancellation information
-* [ ] Normalize meal information
-* [ ] Handle missing fields
+* [x] Convert prices to numeric values
+* [x] Normalize availability
+* [x] Normalize room names
+* [x] Normalize rating
+* [x] Normalize review count
+* [x] Normalize cancellation information
+* [x] Normalize meal information
+* [x] Handle missing fields
+
+**Completion note:**
+Implemented `backend/app/collectors/makemytrip/normalizer.py` with Regex-based parsers to clean unstructured string values into strict numeric formats (e.g. `clean_price`, `clean_rating`). Handled missing fields through safe `get()` defaults.
 
 **Completion requirement:**
 
