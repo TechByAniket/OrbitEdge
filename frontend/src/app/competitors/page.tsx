@@ -1,28 +1,17 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Search, ArrowUpDown, Filter, Star, TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { PageHeader, SectionCard, Badge, EmptyState, fmtINR, fmtRating, fmtCount } from '@/components/ui';
 import clsx from 'clsx';
-
-const ALL_COMPETITORS = [
-  { id: 1, name: 'ELITE HOTEL', type: 'Hotel', location: 'Lonavala', price: 4500, rating: 4.4, reviews: 1015, availability: 'Available', demand: 71, change: 5.2, isPrimary: true },
-  { id: 2, name: "Duke's Retreat", type: 'Resort', location: 'Khandala', price: 6500, rating: 4.7, reviews: 2340, availability: 'Low', demand: 88, change: 3.1, isPrimary: false },
-  { id: 3, name: 'Summit Hotel', type: 'Hotel', location: 'Lonavala', price: 5200, rating: 4.5, reviews: 1876, availability: 'Sold Out', demand: 95, change: 12.4, isPrimary: false },
-  { id: 4, name: 'Rhythm Lonavala', type: 'Hotel', location: 'Lonavala', price: 4100, rating: 4.3, reviews: 934, availability: 'Available', demand: 65, change: -2.1, isPrimary: false },
-  { id: 5, name: 'Fern Hill Resort', type: 'Resort', location: 'Lonavala', price: 3800, rating: 4.2, reviews: 780, availability: 'Low', demand: 78, change: 1.5, isPrimary: false },
-  { id: 6, name: 'Citrus Hotel', type: 'Hotel', location: 'Lonavala', price: 3700, rating: 4.0, reviews: 543, availability: 'Available', demand: 55, change: -4.2, isPrimary: false },
-  { id: 7, name: 'Kundan Villa', type: 'Villa', location: 'Khandala', price: 3200, rating: 4.1, reviews: 321, availability: 'Available', demand: 48, change: 0, isPrimary: false },
-  { id: 8, name: 'Kolhapuri Heritage Inn', type: 'Budget', location: 'Lonavala', price: 2900, rating: 3.8, reviews: 210, availability: 'Available', demand: 40, change: -1.0, isPrimary: false },
-  { id: 9, name: 'Sayaji Lonavala', type: 'Hotel', location: 'Lonavala', price: 5800, rating: 4.6, reviews: 1540, availability: 'Available', demand: 82, change: 7.3, isPrimary: false },
-  { id: 10, name: 'Hilton Shillim', type: 'Luxury', location: 'Shillim', price: 18000, rating: 4.9, reviews: 890, availability: 'Low', demand: 93, change: 15.2, isPrimary: false },
-  { id: 11, name: 'Della Resorts', type: 'Resort', location: 'Lonavala', price: 8500, rating: 4.6, reviews: 3100, availability: 'Low', demand: 90, change: 9.4, isPrimary: false },
-  { id: 12, name: 'Novotel Imagica', type: 'Luxury', location: 'Khopoli', price: 9200, rating: 4.5, reviews: 2100, availability: 'Available', demand: 77, change: 4.2, isPrimary: false },
-];
+import { api } from '@/lib/api';
 
 type SortKey = 'price' | 'rating' | 'reviews' | 'demand' | 'change';
 
 export default function CompetitorsPage() {
+  const [competitors, setCompetitors] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const [search, setSearch] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('price');
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
@@ -30,8 +19,32 @@ export default function CompetitorsPage() {
 
   const types = ['All', 'Hotel', 'Resort', 'Villa', 'Luxury', 'Budget'];
 
+  useEffect(() => {
+    api.getCompetitorsRanking().then(data => {
+      // Map API data to the format expected by the component
+      const mapped = data.map(c => ({
+        id: c.id,
+        name: c.name,
+        type: c.type || 'Hotel',
+        location: c.location || 'Lonavala',
+        price: c.price || 0,
+        rating: c.rating || 0,
+        reviews: c.reviews || 0,
+        availability: c.availability || 'Unknown',
+        demand: c.demand || 0,
+        change: 0, // We could pull this from property_metrics later
+        isPrimary: c.is_primary
+      }));
+      setCompetitors(mapped);
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
+  }, []);
+
   const sorted = useMemo(() => {
-    let data = ALL_COMPETITORS.filter(c =>
+    let data = competitors.filter(c =>
       c.name.toLowerCase().includes(search.toLowerCase()) &&
       (typeFilter === 'All' || c.type === typeFilter)
     );
@@ -41,7 +54,7 @@ export default function CompetitorsPage() {
       return sortDir === 'asc' ? av - bv : bv - av;
     });
     return data;
-  }, [search, sortKey, sortDir, typeFilter]);
+  }, [search, sortKey, sortDir, typeFilter, competitors]);
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir(d => d === 'asc' ? 'desc' : 'asc');
@@ -60,17 +73,17 @@ export default function CompetitorsPage() {
     <div>
       <PageHeader
         title="Competitor Intelligence"
-        subtitle={`Tracking ${ALL_COMPETITORS.length} properties · Lonavala / Khandala market`}
+        subtitle={loading ? 'Loading...' : `Tracking ${competitors.length} properties · Lonavala / Khandala market`}
         breadcrumb={['OrbitEdge', 'Competitors']}
       />
 
       {/* Summary KPIs */}
       <div className="px-8 grid grid-cols-4 gap-4 mb-6">
         {[
-          { label: 'Avg Market Price', value: fmtINR(5233) },
-          { label: 'Sold Out', value: '1 of 12' },
-          { label: 'Avg Rating', value: '4.4 ★' },
-          { label: 'Avg Demand Score', value: '73/100' },
+          { label: 'Total Tracked', value: competitors.length.toString() },
+          { label: 'Sold Out', value: competitors.filter(c => c.availability === 'Sold Out').length.toString() },
+          { label: 'Avg Rating', value: competitors.length ? `${(competitors.reduce((acc, c) => acc + c.rating, 0) / competitors.length).toFixed(1)} ★` : '0 ★' },
+          { label: 'Avg Demand Score', value: competitors.length ? `${(competitors.reduce((acc, c) => acc + c.demand, 0) / competitors.length).toFixed(0)}/100` : '0/100' },
         ].map(k => (
           <div key={k.label} className="rounded-xl border px-5 py-4"
             style={{ background: 'var(--bg-surface)', borderColor: 'var(--border)' }}>
@@ -132,7 +145,9 @@ export default function CompetitorsPage() {
                 </tr>
               </thead>
               <tbody>
-                {sorted.length === 0 ? (
+                {loading ? (
+                    <tr><td colSpan={9} className="text-center py-8 text-sm text-gray-500">Loading properties...</td></tr>
+                ) : sorted.length === 0 ? (
                   <tr><td colSpan={9}>
                     <EmptyState title="No competitors match this filter" description="Try adjusting your search or filter." />
                   </td></tr>
@@ -160,7 +175,7 @@ export default function CompetitorsPage() {
                           <div className="h-full rounded-full transition-all"
                             style={{ width: `${c.demand}%`, background: c.demand > 75 ? 'var(--demand-high)' : c.demand > 50 ? 'var(--demand-medium)' : 'var(--demand-low)' }} />
                         </div>
-                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{c.demand}</span>
+                        <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{c.demand.toFixed(0)}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">

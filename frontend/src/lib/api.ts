@@ -58,4 +58,8 @@ export const api = {
     return props.find(p => p.is_primary) ?? null;
   },
   getScenarios: () => apiFetch<BookingScenario[]>('/api/scenarios'),
+  getDashboardSummary: () => apiFetch<any>('/api/analytics/dashboard'),
+  getCompetitorsRanking: () => apiFetch<any[]>('/api/analytics/competitors'),
+  getAlerts: () => apiFetch<any[]>('/api/alerts'),
 };
+
