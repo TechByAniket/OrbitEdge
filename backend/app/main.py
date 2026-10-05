@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import properties, scenarios
+from app.api import properties, scenarios, tracking, alerts
 
 app = FastAPI(
     title="OrbitEdge API",
@@ -19,6 +19,8 @@ app.add_middleware(
 
 app.include_router(properties.router, prefix="/api/properties", tags=["Properties"])
 app.include_router(scenarios.router, prefix="/api/scenarios", tags=["Scenarios"])
+app.include_router(tracking.router, prefix="/api/tracking", tags=["Tracking"])
+app.include_router(alerts.router, prefix="/api/alerts", tags=["Alerts"])
 
 @app.get("/health")
 def health_check():

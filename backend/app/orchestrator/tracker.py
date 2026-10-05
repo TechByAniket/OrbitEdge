@@ -5,6 +5,7 @@ from typing import List, Dict, Any
 from app.utils.database import get_supabase_client
 from app.collectors.makemytrip.collector import MakeMyTripCollector
 from app.collectors.makemytrip.normalizer import normalize_property_data
+from app.orchestrator.change_detector import ChangeDetector
 
 logger = logging.getLogger(__name__)
 
@@ -12,6 +13,7 @@ class TrackerOrchestrator:
     def __init__(self):
         self.supabase = get_supabase_client()
         self.collector = MakeMyTripCollector(headless=True)
+        self.change_detector = ChangeDetector()
         
     def _calculate_dates(self, date_type: str, stay_duration: int):
         """Helper to get checkin and checkout based on date_type"""
@@ -54,6 +56,16 @@ class TrackerOrchestrator:
                 
             normalized = normalize_property_data(raw_data)
             
+            # Extract available units (try to get from rooms or assume 1 if price exists)
+            rooms = normalized.get("rooms", [])
+            price = next((r["price"] for r in rooms if r.get("price")), None)
+            available_units = None
+            if price is not None:
+                # Basic assumption: if we have a price, it's available. If not, it's sold out.
+                available_units = next((r.get("available_units", 1) for r in rooms if r.get("price")), 1)
+            else:
+                available_units = 0
+            
             # Save Observation
             observation = {
                 "property_id": property_data["id"],
@@ -64,14 +76,20 @@ class TrackerOrchestrator:
                 "stay_duration": scenario_data.get("stay_duration"),
                 "guests": scenario_data.get("guests"),
                 "rooms_requested": scenario_data.get("rooms"),
-                "price": next((r["price"] for r in normalized.get("rooms", []) if r.get("price")), None),
+                "price": price,
+                "available_units": available_units,
                 "rating": normalized.get("rating"),
                 "review_count": normalized.get("review_count"),
                 "source_url": base_url,
                 "raw_payload": raw_data
             }
             
-            self.supabase.table("observations").insert(observation).execute()
+            obs_res = self.supabase.table("observations").insert(observation).execute()
+            
+            # Run Change Detection
+            if obs_res.data:
+                new_obs_id = obs_res.data[0]["id"]
+                self.change_detector.detect_changes(observation, new_obs_id)
             
             # Mark item complete
             self.supabase.table("tracking_run_items").update({
