@@ -108,7 +108,7 @@ class TrackerOrchestrator:
             return False
 
     async def run_tracking_cycle(self):
-        """Main loop to process all active scenarios for all tracked properties."""
+        """Main loop to process all active scenarios for all tracked properties concurrently."""
         logger.info("Starting tracking cycle...")
         
         # 1. Fetch data
@@ -146,24 +146,30 @@ class TrackerOrchestrator:
         items_res = self.supabase.table("tracking_run_items").insert(items_to_insert).execute()
         items = items_res.data
         
-        # 4. Process Loop
+        # 4. Process Loop with Concurrency
         await self.collector.initialize()
         
         success_count = 0
         failed_count = 0
         
-        try:
-            for i, item in enumerate(items):
-                p = next(p for p in properties if p["id"] == item["property_id"])
-                s = next(s for s in scenarios if s["id"] == item["scenario_id"])
-                
-                logger.info(f"Processing {i+1}/{total_combinations}: {p['property_name']} - {s['scenario_name']}")
+        sem = asyncio.Semaphore(5) # 5 concurrent browser tabs to speed it up
+        
+        async def bounded_process(idx: int, item: Dict[str, Any]):
+            nonlocal success_count, failed_count
+            p = next(p for p in properties if p["id"] == item["property_id"])
+            s = next(s for s in scenarios if s["id"] == item["scenario_id"])
+            
+            async with sem:
+                logger.info(f"Processing {idx+1}/{total_combinations}: {p['property_name']} - {s['scenario_name']}")
                 success = await self._process_item(run_id, item, p, s)
                 if success:
                     success_count += 1
                 else:
                     failed_count += 1
-                    
+
+        try:
+            tasks = [bounded_process(i, item) for i, item in enumerate(items)]
+            await asyncio.gather(*tasks)
         finally:
             await self.collector.close()
             

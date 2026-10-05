@@ -61,7 +61,7 @@ def get_competitors_ranking():
             "id": p["id"],
             "name": p["property_name"],
             "type": p["property_type"],
-            "location": p["location"],
+            "location": p.get("market_area", "Lonavala"),
             "is_primary": p["is_primary"],
             "price": latest_obs.get("price"),
             "rating": latest_obs.get("rating"),
