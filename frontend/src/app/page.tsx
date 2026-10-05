@@ -6,6 +6,7 @@ import {
 import { PageHeader, KpiCard, SectionCard, Badge, EmptyState, fmtINR, fmtRating, fmtCount } from '@/components/ui';
 import { PriceTrendChart, CompetitorPriceChart, DemandChart } from '@/components/charts';
 import { api } from '@/lib/api';
+import { RunTrackingButton } from '@/components/ui/RunTrackingButton';
 
 // Demo data for charts until history builds up in DB
 const DEMO_PRICE_TREND = [
@@ -55,10 +56,13 @@ export default async function OverviewPage() {
         subtitle={`Lonavala / Khandala competitive intelligence · ${primaryInfo?.property_name || 'Primary Hotel'}`}
         breadcrumb={['OrbitEdge', 'Overview']}
         actions={
-          <div className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg border"
-            style={{ borderColor: 'var(--border)', color: 'var(--text-muted)', background: 'var(--bg-surface)' }}>
-            <Clock size={12} />
-            Last run: {market.calculated_at ? new Date(market.calculated_at).toLocaleString() : 'N/A'}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg border"
+              style={{ borderColor: 'var(--border)', color: 'var(--text-muted)', background: 'var(--bg-surface)' }}>
+              <Clock size={12} />
+              Last run: {market.calculated_at ? new Date(market.calculated_at).toLocaleString() : 'N/A'}
+            </div>
+            <RunTrackingButton />
           </div>
         }
       />
@@ -180,9 +184,9 @@ export default async function OverviewPage() {
       {/* Competitor Ranking Table */}
       <div className="px-8 mb-8">
         <SectionCard title="Competitor Ranking" subtitle="Sorted by price (ascending)" noPad>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
+          <div className="overflow-x-auto max-h-[65vh] overflow-y-auto custom-scrollbar">
+            <table className="w-full relative">
+              <thead className="sticky top-0 z-10" style={{ background: 'var(--bg-surface)' }}>
                 <tr className="border-b" style={{ borderColor: 'var(--border)' }}>
                   {['#', 'Property', 'Type', 'Price', 'Rating', 'Availability', 'vs Market'].map(h => (
                     <th key={h} className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider"

@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   LayoutDashboard, Building2, TrendingUp, CalendarCheck,
   BarChart3, DollarSign, Bell, BrainCircuit, ChevronRight,
-  Satellite, Activity
+  Satellite, Activity, Server, Settings2
 } from 'lucide-react';
 import clsx from 'clsx';
 
@@ -18,6 +18,8 @@ const NAV_ITEMS = [
   { label: 'Demand',      href: '/demand',        icon: Activity },
   { label: 'Revenue',     href: '/revenue',       icon: DollarSign },
   { label: 'Alerts',      href: '/alerts',        icon: Bell },
+  { label: 'Tracking',    href: '/tracking',      icon: Server },
+  { label: 'Scenarios',   href: '/scenarios',     icon: Settings2 },
   { label: 'AI Advisor',  href: '/ai',            icon: BrainCircuit },
 ];
 

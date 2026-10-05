@@ -125,9 +125,9 @@ export default function CompetitorsPage() {
           </div>
 
           {/* Table */}
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
+          <div className="overflow-x-auto max-h-[65vh] overflow-y-auto custom-scrollbar">
+            <table className="w-full relative">
+              <thead className="sticky top-0 z-10" style={{ background: 'var(--bg-surface)' }}>
                 <tr className="border-b" style={{ borderColor: 'var(--border)' }}>
                   <th className="text-left px-4 py-3 text-xs font-medium uppercase tracking-wider w-8"
                     style={{ color: 'var(--text-muted)' }}>#</th>

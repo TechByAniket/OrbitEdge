@@ -166,6 +166,15 @@ class TrackerOrchestrator:
                     success_count += 1
                 else:
                     failed_count += 1
+                
+                # Update progress in DB so frontend progress bar fills in real-time
+                try:
+                    self.supabase.table("tracking_runs").update({
+                        "successful_properties": success_count,
+                        "failed_properties": failed_count
+                    }).eq("id", run_id).execute()
+                except Exception:
+                    pass
 
         try:
             tasks = [bounded_process(i, item) for i, item in enumerate(items)]

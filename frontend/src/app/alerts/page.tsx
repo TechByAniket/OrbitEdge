@@ -1,66 +1,107 @@
-import { PageHeader, SectionCard, Badge } from '@/components/ui';
-import { Bell, TrendingUp, TrendingDown, AlertTriangle, Info, CheckCircle } from 'lucide-react';
-
-const ALERTS = [
-  { id: 1, type: 'price_surge', severity: 'warning', title: 'Summit Hotel price surge', desc: 'Summit Hotel increased price by ₹800 (+18.2%) in the last 6 hours.', time: '2h ago', read: false },
-  { id: 2, type: 'sold_out', severity: 'negative', title: '6 competitors sold out', desc: 'Duke\'s Retreat, Summit, Della, Sayaji, Hilton, Novotel are fully booked for this weekend.', time: '3h ago', read: false },
-  { id: 3, type: 'above_market', severity: 'brand', title: 'You are above market average', desc: 'Your current rate (₹4,500) is 8.4% above the market average (₹4,150).', time: '6h ago', read: false },
-  { id: 4, type: 'price_drop', severity: 'positive', title: 'Fern Hill dropped price', desc: 'Fern Hill Resort decreased rate by ₹400 (−9.5%). This may indicate soft demand in the budget tier.', time: '4h ago', read: true },
-  { id: 5, type: 'info', severity: 'neutral', title: 'Weekly tracking completed', desc: 'All 54 properties tracked successfully. 2 properties had temporary navigation errors and were retried.', time: '1d ago', read: true },
-];
+import { PageHeader, SectionCard, Badge, EmptyState, fmtINR } from '@/components/ui';
+import { Bell, TrendingUp, TrendingDown, AlertTriangle, Info, CheckCircle, Activity } from 'lucide-react';
+import { api } from '@/lib/api';
 
 const icons: Record<string, React.ReactNode> = {
-  price_surge: <TrendingUp size={16} />,
-  sold_out: <AlertTriangle size={16} />,
-  above_market: <Info size={16} />,
-  price_drop: <TrendingDown size={16} />,
-  info: <CheckCircle size={16} />,
+  PRICE_INCREASE: <TrendingUp size={16} />,
+  PRICE_DECREASE: <TrendingDown size={16} />,
+  SOLD_OUT: <AlertTriangle size={16} />,
+  AVAILABILITY_DECREASE: <TrendingDown size={16} />,
+  AVAILABILITY_INCREASE: <TrendingUp size={16} />,
+  DEFAULT: <Info size={16} />,
 };
 
 const severityColor: Record<string, string> = {
-  warning: 'var(--warning)',
-  negative: 'var(--negative)',
-  brand: 'var(--brand)',
-  positive: 'var(--positive)',
-  neutral: 'var(--text-muted)',
+  HIGH: 'var(--negative)',
+  MEDIUM: 'var(--warning)',
+  LOW: 'var(--brand)',
+  DEFAULT: 'var(--text-muted)'
 };
 
-export default function AlertsPage() {
-  const unread = ALERTS.filter(a => !a.read).length;
+export default async function AlertsPage() {
+  const alerts = await api.getAlerts().catch(() => []);
+  const unreadCount = alerts.filter((a: any) => !a.is_read).length;
 
   return (
     <div>
       <PageHeader
         title="Alerts"
-        subtitle={`${unread} unread alerts · Monitoring 54 properties`}
+        subtitle={`${unreadCount} unread alerts · Market intelligence monitoring`}
         breadcrumb={['OrbitEdge', 'Alerts']}
-        actions={<Badge variant="negative">{unread} New</Badge>}
+        actions={unreadCount > 0 ? <Badge variant="negative">{unreadCount} New</Badge> : null}
       />
 
       <div className="px-8 mb-8">
         <SectionCard noPad>
-          <div className="divide-y" style={{ borderColor: 'var(--border)' }}>
-            {ALERTS.map(alert => (
-              <div key={alert.id}
-                className="flex items-start gap-4 px-6 py-5 hover:bg-white/[0.02] transition-colors"
-                style={{ opacity: alert.read ? 0.65 : 1 }}>
-                <div className="mt-0.5 flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center"
-                  style={{ background: `${severityColor[alert.severity]}15`, color: severityColor[alert.severity] }}>
-                  {icons[alert.type]}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{alert.title}</div>
-                    <div className="flex items-center gap-2 flex-shrink-0">
-                      {!alert.read && <span className="w-2 h-2 rounded-full" style={{ background: 'var(--brand)' }} />}
-                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{alert.time}</span>
+          {alerts.length === 0 ? (
+            <div className="p-8">
+              <EmptyState 
+                icon={<Bell size={24} />} 
+                title="No recent alerts" 
+                description="Run the tracker to detect market movements and pricing changes." 
+              />
+            </div>
+          ) : (
+            <div className="p-6">
+              <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-2 custom-scrollbar">
+                {alerts.map((alert: any) => {
+                  const isRead = alert.is_read;
+                  const severity = alert.severity || 'DEFAULT';
+                  const type = alert.event_type || 'DEFAULT';
+                  const time = new Date(alert.created_at).toLocaleString();
+                  const title = alert.alert_type || alert.alert_title || 'Market Alert';
+                  const message = alert.message || alert.alert_message || '';
+
+                  // Helper to colorize numbers, currencies, and percentages based on context
+                  const colorizeText = (text: string, eventType: string) => {
+                    const parts = text.split(/(₹\d+(?:,\d+)*(?:\.\d+)?|[+-\u2212]?\d+(?:\.\d+)?%|\b\d+\b)/g);
+                    return parts.map((part, i) => {
+                      if (/(₹\d+(?:,\d+)*(?:\.\d+)?|[+-\u2212]?\d+(?:\.\d+)?%|\b\d+\b)/.test(part)) {
+                        let color = 'var(--brand)'; // default blue
+                        
+                        // If it explicitly has a + or is a currency in a price increase
+                        if (part.includes('+') || (eventType === 'PRICE_INCREASE' && part.startsWith('₹'))) {
+                          color = 'var(--positive)';
+                        } 
+                        // If it explicitly has a - or is a currency in a price decrease
+                        else if (part.includes('-') || part.includes('\u2212') || (eventType === 'PRICE_DECREASE' && part.startsWith('₹'))) {
+                          color = 'var(--negative)';
+                        }
+
+                        return <span key={i} className="font-semibold" style={{ color }}>{part}</span>;
+                      }
+                      return part;
+                    });
+                  };
+                  
+                  return (
+                    <div key={alert.id}
+                      className="rounded-xl border p-5 flex items-start gap-4 transition-all hover:border-blue-500/30"
+                      style={{ 
+                        borderColor: 'var(--border)', 
+                        background: 'var(--bg-surface)', 
+                        opacity: isRead ? 0.75 : 1 
+                      }}>
+                      <div className="mt-0.5 flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center"
+                        style={{ background: `${severityColor[severity] || severityColor.DEFAULT}15`, color: severityColor[severity] || severityColor.DEFAULT }}>
+                        {icons[type] || icons.DEFAULT}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2 mb-1">
+                          <div className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>{colorizeText(title, type)}</div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            {!isRead && <span className="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.8)]" style={{ background: 'var(--brand)' }} />}
+                            <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{time}</span>
+                          </div>
+                        </div>
+                        <div className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{colorizeText(message, type)}</div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>{alert.desc}</div>
-                </div>
+                  );
+                })}
               </div>
-            ))}
-          </div>
+            </div>
+          )}
         </SectionCard>
       </div>
     </div>

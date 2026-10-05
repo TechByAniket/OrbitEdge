@@ -15,9 +15,14 @@ def get_dashboard_summary():
     market = market_res.data[0] if market_res.data else {}
 
     # 2. Get Primary Property Metrics
-    primary_res = supabase.table("properties").select("id, property_name, price:observations(price)").eq("is_primary", True).order("created_at", foreign_table="observations", desc=True).limit(1).execute()
+    primary_res = supabase.table("properties").select("id, property_name").eq("is_primary", True).limit(1).execute()
     primary = primary_res.data[0] if primary_res.data else {}
     
+    if primary.get("id"):
+        # Fetch latest observation price
+        obs_res = supabase.table("observations").select("price").eq("property_id", primary["id"]).order("created_at", desc=True).limit(1).execute()
+        primary["price"] = obs_res.data if obs_res.data else []
+        
     primary_metrics = {}
     if primary.get("id"):
         pm_res = supabase.table("property_metrics").select("*").eq("property_id", primary["id"]).order("calculated_at", desc=True).limit(1).execute()

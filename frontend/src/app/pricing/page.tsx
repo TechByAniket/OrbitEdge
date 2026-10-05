@@ -2,6 +2,8 @@ import { PageHeader, SectionCard, Badge, EmptyState, fmtINR, KpiCard } from '@/c
 import { DollarSign, TrendingUp, AlertTriangle, ArrowRightLeft, Activity } from 'lucide-react';
 import { api } from '@/lib/api';
 
+export const dynamic = 'force-dynamic';
+
 export default async function PricingPage() {
   const summary = await api.getDashboardSummary().catch(() => null);
   const competitorsData = await api.getCompetitorsRanking().catch(() => []);
@@ -55,48 +57,114 @@ export default async function PricingPage() {
 
       <div className="px-8 mb-8 grid grid-cols-3 gap-6">
         <div className="col-span-2">
-            <SectionCard title="Market Rate Distribution" subtitle="Price distribution curve across all competitors">
-                <div className="h-72 w-full flex items-end justify-between gap-1 pb-4 pt-10 border-b relative" style={{ borderColor: 'var(--border-subtle)' }}>
-                    {/* Y-Axis labels */}
-                    <div className="absolute left-0 top-0 bottom-4 flex flex-col justify-between text-xs text-gray-500 py-2">
-                        <span>15+</span>
-                        <span>10</span>
-                        <span>5</span>
-                        <span>0 props</span>
-                    </div>
+            <SectionCard title="Market Rate Distribution" subtitle={`Price spread across ${sortedComps.length} tracked properties`}>
+                {sortedComps.length === 0 ? (
+                  <div className="h-72 flex items-center justify-center text-sm" style={{ color: 'var(--text-muted)' }}>
+                    No competitor data yet. Run the tracker to populate prices.
+                  </div>
+                ) : (() => {
+                  const CHART_H = 220; // px — explicit height for bars
 
-                    <div className="pl-12 flex items-end justify-between w-full h-full gap-2">
-                        {/* Mock Distribution Bars based on standard deviation */}
-                        {[2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000].map(bucket => {
-                            // Find properties within this bucket (+/- 500)
-                            const count = sortedComps.filter(c => c.price >= bucket - 500 && c.price < bucket + 500).length;
-                            const height = Math.min(100, Math.max(5, (count / Math.max(1, sortedComps.length)) * 300));
-                            
-                            const isPrimaryBucket = primaryPrice >= bucket - 500 && primaryPrice < bucket + 500;
-                            const isAvgBucket = marketAvg >= bucket - 500 && marketAvg < bucket + 500;
+                  const prices = sortedComps.map(c => c.price || 0).filter(p => p > 0);
+                  const minP = Math.floor(Math.min(...prices) / 1000) * 1000;
+                  const maxP = Math.ceil(Math.max(...prices) / 1000) * 1000;
+                  const bucketSize = Math.max(1000, Math.ceil((maxP - minP) / 10 / 500) * 500);
+                  const buckets: number[] = [];
+                  for (let b = minP; b <= maxP; b += bucketSize) buckets.push(b);
+
+                  const counts = buckets.map(b => prices.filter(p => p >= b && p < b + bucketSize).length);
+                  const maxCount = Math.max(1, ...counts);
+
+                  return (
+                    <div>
+                      {/* Chart area */}
+                      <div className="flex gap-3 items-end" style={{ height: `${CHART_H + 20}px`, paddingBottom: '28px' }}>
+
+                        {/* Y-Axis labels */}
+                        <div className="flex flex-col justify-between text-xs h-full pb-0 shrink-0" style={{ color: 'var(--text-muted)', height: `${CHART_H}px` }}>
+                          <span>{maxCount}</span>
+                          <span>{Math.round(maxCount * 0.66)}</span>
+                          <span>{Math.round(maxCount * 0.33)}</span>
+                          <span>0</span>
+                        </div>
+
+                        {/* Bars */}
+                        <div className="flex items-end gap-1.5 w-full" style={{ height: `${CHART_H}px` }}>
+                          {buckets.map((bucket, i) => {
+                            const count = counts[i];
+                            const barH = count === 0 ? 0 : Math.max(6, Math.round((count / maxCount) * CHART_H));
+                            const isPrimary = primaryPrice >= bucket && primaryPrice < bucket + bucketSize;
+                            const isAvg    = marketAvg >= bucket && marketAvg < bucket + bucketSize;
+
+                            const bg = isPrimary
+                              ? 'linear-gradient(to top, #2563eb, #60a5fa)'
+                              : isAvg
+                              ? 'linear-gradient(to top, #d97706, #fbbf24)'
+                              : 'linear-gradient(to top, rgba(59,130,246,0.18), rgba(59,130,246,0.45))';
 
                             return (
-                                <div key={bucket} className="flex-1 flex flex-col items-center justify-end relative group">
-                                    {isPrimaryBucket && (
-                                        <div className="absolute -top-8 text-xs font-bold px-2 py-1 rounded bg-blue-500/10 text-blue-500 border border-blue-500/20 whitespace-nowrap">
-                                            You ({fmtINR(primaryPrice)})
-                                        </div>
-                                    )}
-                                    <div 
-                                        className={`w-full rounded-t-sm transition-all duration-500 ${isPrimaryBucket ? 'bg-blue-500' : 'bg-white/10 group-hover:bg-white/20'}`}
-                                        style={{ height: `${height}%`, minHeight: count > 0 ? '4px' : '0' }}
-                                    ></div>
-                                    <div className="absolute -bottom-6 text-xs text-gray-500 rotate-45 origin-top-left">
-                                        {fmtINR(bucket)}
-                                    </div>
+                              <div key={bucket} className="flex-1 flex flex-col items-center justify-end relative group" style={{ height: `${CHART_H}px` }}>
+                                {/* You / Avg badge */}
+                                {isPrimary && (
+                                  <div className="absolute text-xs font-bold px-1.5 py-0.5 rounded whitespace-nowrap z-10"
+                                    style={{ bottom: `${barH + 6}px`, background: 'rgba(59,130,246,0.25)', color: 'var(--brand)', border: '1px solid rgba(59,130,246,0.4)' }}>
+                                    You
+                                  </div>
+                                )}
+                                {isAvg && !isPrimary && (
+                                  <div className="absolute text-xs font-bold px-1.5 py-0.5 rounded whitespace-nowrap z-10"
+                                    style={{ bottom: `${barH + 6}px`, background: 'rgba(245,158,11,0.2)', color: 'var(--warning)', border: '1px solid rgba(245,158,11,0.35)' }}>
+                                    Avg
+                                  </div>
+                                )}
+                                {/* Hover tooltip */}
+                                {count > 0 && (
+                                  <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 hidden group-hover:block text-white text-xs rounded-lg px-2.5 py-1.5 whitespace-nowrap z-20 shadow-xl"
+                                    style={{ background: 'var(--bg-overlay)', border: '1px solid var(--border)' }}>
+                                    {count} hotel{count !== 1 ? 's' : ''}<br/>
+                                    <span style={{ color: 'var(--text-muted)' }}>{fmtINR(bucket)}–{fmtINR(bucket + bucketSize)}</span>
+                                  </div>
+                                )}
+                                {/* Bar itself */}
+                                <div
+                                  className="w-full rounded-t-md transition-all duration-500 cursor-pointer hover:brightness-125"
+                                  style={{
+                                    height: `${barH}px`,
+                                    background: bg,
+                                    boxShadow: isPrimary ? '0 0 18px rgba(59,130,246,0.4)' : isAvg ? '0 0 12px rgba(245,158,11,0.3)' : 'none',
+                                  }}
+                                />
+                                {/* X label */}
+                                <div className="absolute text-center whitespace-nowrap" style={{ bottom: '-22px', fontSize: '10px', color: 'var(--text-muted)' }}>
+                                  {(bucket / 1000).toFixed(0)}k
                                 </div>
+                              </div>
                             );
-                        })}
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Legend */}
+                      <div className="flex items-center gap-5 mt-2 text-xs" style={{ color: 'var(--text-muted)' }}>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-3 h-3 rounded-sm inline-block" style={{ background: 'linear-gradient(to top,#2563eb,#60a5fa)' }} />
+                          Your Rate
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-3 h-3 rounded-sm inline-block" style={{ background: 'linear-gradient(to top,#d97706,#fbbf24)' }} />
+                          Market Avg
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-3 h-3 rounded-sm inline-block" style={{ background: 'rgba(59,130,246,0.35)' }} />
+                          Competitors
+                        </div>
+                      </div>
                     </div>
-                </div>
-                <div className="h-10"></div> {/* Spacer for rotated labels */}
+                  );
+                })()}
             </SectionCard>
         </div>
+
         
         <div>
             <SectionCard title="Pricing Opportunities" subtitle="AI-driven rate recommendations">

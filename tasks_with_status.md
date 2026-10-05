@@ -604,23 +604,23 @@ Phase 7 and 8 implemented in `backend/app/orchestrator/analytics_engine.py`. Cal
 
 Create alerts for:
 
-* [ ] Competitor price increase
-* [ ] Competitor price decrease
-* [ ] Availability drop
-* [ ] Competitor sold out
-* [ ] Primary property sold out
-* [ ] High demand
-* [ ] Large rating/review change
-* [ ] Significant booking velocity
+* [x] Competitor price increase
+* [x] Competitor price decrease
+* [x] Availability drop
+* [x] Competitor sold out
+* [x] Primary property sold out
+* [x] High demand
+* [x] Large rating/review change
+* [x] Significant booking velocity
 
 ---
 
 ## TASK 9.2 — Alert API
 
-* [ ] List alerts
-* [ ] Filter alerts
-* [ ] Mark alert as read
-* [ ] Get recent alerts
+* [x] List alerts
+* [x] Filter alerts
+* [x] Mark alert as read
+* [x] Get recent alerts
 
 ---
 
@@ -630,16 +630,16 @@ Create alerts for:
 
 Provide aggregated data for:
 
-* [ ] Overview
-* [ ] Market summary
-* [ ] Primary property
-* [ ] Competitor comparison
-* [ ] Pricing
-* [ ] Availability
-* [ ] Demand
-* [ ] Revenue
-* [ ] Changes
-* [ ] Alerts
+* [x] Overview
+* [x] Market summary
+* [x] Primary property
+* [x] Competitor comparison
+* [x] Pricing
+* [x] Availability
+* [x] Demand
+* [x] Revenue
+* [x] Changes
+* [x] Alerts
 
 ---
 
@@ -660,12 +660,12 @@ Implemented in `backend/app/api/tracking.py` exposing `/start`, `/status`, and `
 
 ## TASK 10.3 — Backend Error Handling
 
-* [ ] Standardize API errors
-* [ ] Handle invalid properties
-* [ ] Handle invalid scenarios
-* [ ] Handle collector failures
-* [ ] Handle database failures
-* [ ] Return useful error messages
+* [x] Standardize API errors
+* [x] Handle invalid properties
+* [x] Handle invalid scenarios
+* [x] Handle collector failures
+* [x] Handle database failures
+* [x] Return useful error messages
 
 ---
 
@@ -893,12 +893,12 @@ Examples:
 
 ## TASK 14.1 — Manual Tracking Button
 
-* [ ] Add "Run Tracking" button
-* [ ] Select scenario
-* [ ] Start tracking
-* [ ] Display progress
-* [ ] Display success/failure counts
-* [ ] Refresh dashboard after completion
+* [x] Add "Run Tracking" button
+* [x] Select scenario
+* [x] Start tracking
+* [x] Display progress
+* [x] Display success/failure counts
+* [x] Refresh dashboard after completion
 
 ---
 
@@ -906,14 +906,14 @@ Examples:
 
 Show:
 
-* [ ] Run ID
-* [ ] Start time
-* [ ] End time
-* [ ] Scenario
-* [ ] Properties processed
-* [ ] Success count
-* [ ] Failure count
-* [ ] Run status
+* [x] Run ID
+* [x] Start time
+* [x] End time
+* [x] Scenario
+* [x] Properties processed
+* [x] Success count
+* [x] Failure count
+* [x] Run status
 
 ---
 
@@ -975,18 +975,18 @@ A complete tracking run can be demonstrated end-to-end.
 
 Verify:
 
-* [ ] Frontend connects to backend
-* [ ] Backend connects to Supabase
-* [ ] Properties load
-* [ ] Competitors load
-* [ ] Tracking can start
-* [ ] Observations are stored
-* [ ] Historical observations remain intact
-* [ ] Changes are detected
-* [ ] Metrics are calculated
-* [ ] Dashboard updates
-* [ ] Alerts appear
-* [ ] AI Advisor can access data
+* [x] Frontend connects to backend
+* [x] Backend connects to Supabase
+* [x] Properties load
+* [x] Competitors load
+* [x] Tracking can start
+* [x] Observations are stored
+* [x] Historical observations remain intact
+* [x] Changes are detected
+* [x] Metrics are calculated
+* [x] Dashboard updates
+* [x] Alerts appear
+* [x] AI Advisor can access data
 
 ---
 
@@ -994,24 +994,24 @@ Verify:
 
 Verify:
 
-* [ ] One property failing does not stop run
-* [ ] Missing data does not crash dashboard
-* [ ] Empty observations are handled
-* [ ] MMT page changes are handled gracefully
-* [ ] Database errors are surfaced
-* [ ] API errors are displayed properly
+* [x] One property failing does not stop run
+* [x] Missing data does not crash dashboard
+* [x] Empty observations are handled
+* [x] MMT page changes are handled gracefully
+* [x] Database errors are surfaced
+* [x] API errors are displayed properly
 
 ---
 
 ## TASK 15.3 — Performance & Usability Pass
 
-* [ ] Remove unnecessary API calls
-* [ ] Avoid unnecessary database queries
-* [ ] Improve loading states
-* [ ] Improve dashboard responsiveness
-* [ ] Ensure tables work with 50+ competitors
-* [ ] Ensure charts remain readable
-* [ ] Ensure tracking does not freeze frontend
+* [x] Remove unnecessary API calls
+* [x] Avoid unnecessary database queries
+* [x] Improve loading states
+* [x] Improve dashboard responsiveness
+* [x] Ensure tables work with 50+ competitors
+* [x] Ensure charts remain readable
+* [x] Ensure tracking does not freeze frontend
 
 ---
 
@@ -1021,17 +1021,17 @@ Verify:
 
 Document:
 
-* [ ] Project overview
-* [ ] Architecture
-* [ ] Tech stack
-* [ ] Setup instructions
-* [ ] Environment variables
-* [ ] Supabase setup
-* [ ] CSV import
-* [ ] Running backend
-* [ ] Running frontend
-* [ ] Running tracking
-* [ ] Dashboard usage
+* [x] Project overview
+* [x] Architecture
+* [x] Tech stack
+* [x] Setup instructions
+* [x] Environment variables
+* [x] Supabase setup
+* [x] CSV import
+* [x] Running backend
+* [x] Running frontend
+* [x] Running tracking
+* [x] Dashboard usage
 
 ---
 
@@ -1039,10 +1039,10 @@ Document:
 
 Verify `ARCHITECTURE.md` matches the actual implementation.
 
-* [ ] Update outdated sections
-* [ ] Remove architecture that was not implemented
-* [ ] Document actual data flow
-* [ ] Document actual database structure
+* [x] Update outdated sections
+* [x] Remove architecture that was not implemented
+* [x] Document actual data flow
+* [x] Document actual database structure
 
 ---
 
@@ -1050,13 +1050,13 @@ Verify `ARCHITECTURE.md` matches the actual implementation.
 
 Create documentation explaining:
 
-* [ ] Availability-based booking estimation
-* [ ] Room-night estimation
-* [ ] Revenue estimation
-* [ ] Demand score
-* [ ] Booking velocity
-* [ ] Limitations
-* [ ] Why these are estimates and not confirmed private bookings
+* [x] Availability-based booking estimation
+* [x] Room-night estimation
+* [x] Revenue estimation
+* [x] Demand score
+* [x] Booking velocity
+* [x] Limitations
+* [x] Why these are estimates and not confirmed private bookings
 
 ---
 
@@ -1064,23 +1064,23 @@ Create documentation explaining:
 
 Verify the project satisfies the assignment:
 
-* [ ] Primary property exists
-* [ ] 30+ competitors exist
-* [ ] 50+ properties supported
-* [ ] MakeMyTrip tracking works
-* [ ] Historical snapshots exist
-* [ ] Booking scenarios exist
-* [ ] Availability tracked
-* [ ] Pricing tracked
-* [ ] Changes detected
-* [ ] Booking estimates calculated
-* [ ] Revenue estimates calculated
-* [ ] Demand calculated
-* [ ] Dashboard works
-* [ ] Alerts work
-* [ ] AI Advisor works
-* [ ] Live tracking demonstrated
-* [ ] Documentation complete
+* [x] Primary property exists
+* [x] 30+ competitors exist
+* [x] 50+ properties supported
+* [x] MakeMyTrip tracking works
+* [x] Historical snapshots exist
+* [x] Booking scenarios exist
+* [x] Availability tracked
+* [x] Pricing tracked
+* [x] Changes detected
+* [x] Booking estimates calculated
+* [x] Revenue estimates calculated
+* [x] Demand calculated
+* [x] Dashboard works
+* [x] Alerts work
+* [x] AI Advisor works
+* [x] Live tracking demonstrated
+* [x] Documentation complete
 
 ---
 

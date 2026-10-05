@@ -1,10 +1,9 @@
 import { PageHeader, SectionCard, Badge } from '@/components/ui';
 import { Sparkles, AlertTriangle, TrendingUp, Info } from 'lucide-react';
 
-// Fetch insights directly from the API endpoint
 async function getInsights() {
     try {
-        const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/ai/insights', { next: { revalidate: 60 }});
+        const res = await fetch((process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000') + '/api/ai/insights', { cache: 'no-store' });
         if (!res.ok) return [];
         return res.json();
     } catch {
