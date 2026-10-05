@@ -504,10 +504,10 @@ Concept:
 
 `Estimated rooms sold = Previous observed availability - Current observed availability`
 
-* [ ] Calculate only when comparison is valid
-* [ ] Handle availability increases
-* [ ] Handle sold-out state
-* [ ] Clearly label as estimated
+* [x] Calculate only when comparison is valid
+* [x] Handle availability increases
+* [x] Handle sold-out state
+* [x] Clearly label as estimated
 
 **Important:**
 
@@ -521,9 +521,9 @@ Concept:
 
 `Estimated room nights = Estimated rooms sold × stay duration`
 
-* [ ] Calculate by observation/scenario
-* [ ] Aggregate by property
-* [ ] Aggregate by date
+* [x] Calculate by observation/scenario
+* [x] Aggregate by property
+* [x] Aggregate by date
 
 ---
 
@@ -533,10 +533,10 @@ Concept:
 
 `Estimated gross booking value = Estimated room nights × average observed selling price`
 
-* [ ] Use observed selling price
-* [ ] Handle taxes separately
-* [ ] Store revenue estimate
-* [ ] Label revenue as estimated
+* [x] Use observed selling price
+* [x] Handle taxes separately
+* [x] Store revenue estimate
+* [x] Label revenue as estimated
 
 ---
 
@@ -544,15 +544,15 @@ Concept:
 
 Calculate:
 
-* [ ] Estimated rooms sold
-* [ ] Estimated room nights
-* [ ] Average observed selling price
-* [ ] Estimated gross booking value
-* [ ] Availability trend
-* [ ] Booking velocity
-* [ ] Sold-out frequency
-* [ ] Weekend performance
-* [ ] Weekday performance
+* [x] Estimated rooms sold
+* [x] Estimated room nights
+* [x] Average observed selling price
+* [x] Estimated gross booking value
+* [x] Availability trend
+* [x] Booking velocity
+* [x] Sold-out frequency
+* [x] Weekend performance
+* [x] Weekday performance
 
 ---
 
@@ -562,10 +562,10 @@ Calculate:
 
 Calculate:
 
-* [ ] Availability changes over time
-* [ ] Estimated rooms sold per period
-* [ ] Rate of availability decline
-* [ ] Recent booking pressure
+* [x] Availability changes over time
+* [x] Estimated rooms sold per period
+* [x] Rate of availability decline
+* [x] Recent booking pressure
 
 ---
 
@@ -573,11 +573,11 @@ Calculate:
 
 Create a 0–100 demand score based on:
 
-* [ ] Availability pressure
-* [ ] Booking velocity
-* [ ] Sold-out frequency
-* [ ] Price movement
-* [ ] Weekend pressure
+* [x] Availability pressure
+* [x] Booking velocity
+* [x] Sold-out frequency
+* [x] Price movement
+* [x] Weekend pressure
 
 ---
 
@@ -585,13 +585,16 @@ Create a 0–100 demand score based on:
 
 Calculate:
 
-* [ ] Average market price
-* [ ] Median market price
-* [ ] Market availability
-* [ ] Market demand
-* [ ] Market booking velocity
-* [ ] Sold-out competitor count
-* [ ] Primary property position vs market
+* [x] Average market price
+* [x] Median market price
+* [x] Market availability
+* [x] Market demand
+* [x] Market booking velocity
+* [x] Sold-out competitor count
+* [x] Primary property position vs market
+
+**Completion note:**
+Phase 7 and 8 implemented in `backend/app/orchestrator/analytics_engine.py`. Calculates `property_metrics` and `market_metrics` utilizing change detection data over a 7-day trailing window. Automatically hooked into the end of `tracker.py` run cycle.
 
 ---
 

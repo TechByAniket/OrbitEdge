@@ -177,3 +177,11 @@ class TrackerOrchestrator:
             }).eq("id", run_id).execute()
             
             logger.info(f"Tracking cycle finished. Status: {status}")
+            
+            # 6. Run Analytics
+            try:
+                from app.orchestrator.analytics_engine import AnalyticsEngine
+                analytics = AnalyticsEngine()
+                analytics.run_analytics_cycle()
+            except Exception as e:
+                logger.error(f"Failed to run analytics cycle: {e}")
