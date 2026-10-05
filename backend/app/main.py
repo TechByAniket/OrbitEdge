@@ -1,0 +1,25 @@
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.api import properties, scenarios
+
+app = FastAPI(
+    title="OrbitEdge API",
+    description="Backend API for OrbitEdge competitor tracking",
+    version="1.0.0"
+)
+
+# CORS configuration
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins, restrict in production
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
+
+app.include_router(properties.router, prefix="/api/properties", tags=["Properties"])
+app.include_router(scenarios.router, prefix="/api/scenarios", tags=["Scenarios"])
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
